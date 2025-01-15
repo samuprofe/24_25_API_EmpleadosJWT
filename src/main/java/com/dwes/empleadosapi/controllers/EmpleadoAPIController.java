@@ -1,7 +1,9 @@
 package com.dwes.empleadosapi.controllers;
 
 import com.dwes.empleadosapi.entities.Empleado;
+import com.dwes.empleadosapi.entities.Proyecto;
 import com.dwes.empleadosapi.repositories.EmpleadoRepository;
+import com.dwes.empleadosapi.repositories.ProyectoRepository;
 import jakarta.servlet.ServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ public class EmpleadoAPIController {
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
+    @Autowired
+    private ProyectoRepository proyectoRepository;
 
     /**
      * Obtener todos los empleados en un JSON
@@ -114,5 +118,32 @@ public class EmpleadoAPIController {
                     return ResponseEntity.noContent().build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    //localhost:8080/empleados/7/proyectos POST
+    @PostMapping("/empleados/{id}/proyectos")
+    public ResponseEntity<Empleado> insertProyecto(@PathVariable Long id, @RequestBody Proyecto proyecto){
+        Optional<Empleado> empleado = empleadoRepository.findById(id);
+        Optional<Proyecto> proyectoBD = proyectoRepository.findById(proyecto.getId());
+        if(empleado.isPresent() && proyectoBD.isPresent()) {
+            empleado.get().getProyectos().add(proyectoBD.get());
+            empleadoRepository.save(empleado.get());
+            return ResponseEntity.ok(empleado.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //localhost:8080/empleados/7/proyectos/5 DELETE
+    @DeleteMapping("/empleados/{idEmpleado}/proyectos/{idProyecto}")
+    public ResponseEntity<Empleado> deleteProyecto(@PathVariable Long idEmpleado, @PathVariable Long idProyecto){
+        Optional<Empleado> empleado = empleadoRepository.findById(idEmpleado);
+        Optional<Proyecto> proyecto = proyectoRepository.findById(idProyecto);
+        if(empleado.isPresent() && proyecto.isPresent()) {
+            empleado.get().getProyectos().remove(proyecto.get());
+            return ResponseEntity.ok(empleado.get());
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
