@@ -146,4 +146,14 @@ public class EmpleadoAPIController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    //localhost:8080/empleados/7/proyectos GET
+    @GetMapping("/empleados/{id}/proyectos")
+    public ResponseEntity<List<Proyecto>> getProyecto(@PathVariable Long id){
+        Optional<Empleado> empleado = empleadoRepository.findById(id);
+        if(empleado.isPresent()) {
+            return ResponseEntity.ok(empleado.get().getProyectos());
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
