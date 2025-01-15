@@ -27,6 +27,25 @@ public class EmpleadoAPIController {
     }
 
     /**
+     * Obtiene un empleado
+     */
+    @GetMapping("/empleados/{id}")
+    public ResponseEntity<Empleado> getEmpleado(@PathVariable Long id){
+        /*
+        Optional<Empleado> empleado = empleadoRepository.findById(id);
+        if (empleado.isPresent()) {
+            return ResponseEntity.ok().body(empleado.get()); // Devuelve el código status 200 OK
+        } else {
+            return ResponseEntity.notFound().build(); // Devuelve el código 404 Not Found
+        }
+         */
+
+        return empleadoRepository.findById(id)
+                .map(empleado -> ResponseEntity.ok().body(empleado))    //Devuelve el código status 200 OK
+                .orElse(ResponseEntity.notFound().build());     //Devuelve el código 404 Not Found
+    }
+
+    /**
      * Insertar un empleado (recibe los datos en el cuerpo (body) en formato JSON)
      */
     @PostMapping("/empleados")
@@ -35,16 +54,6 @@ public class EmpleadoAPIController {
         return ResponseEntity.status(HttpStatus.CREATED).body(empleadoGuardado);    //Devuelve el código status 201 Created
     }
 
-
-    /**
-     * Obtiene un empleado
-     */
-    @GetMapping("/empleados/{id}")
-    public ResponseEntity<Empleado> getEmpleado(@PathVariable Long id){
-        return empleadoRepository.findById(id)
-                .map(empleado -> ResponseEntity.ok().body(empleado))    //Devuelve el código status 200 OK
-                .orElse(ResponseEntity.notFound().build());     //Devuelve el código 404 Not Found
-    }
 
     /**
      * Modifica un empleado
@@ -87,6 +96,7 @@ public class EmpleadoAPIController {
     @DeleteMapping("/empleados/{id}")
     public ResponseEntity<?> deleteEmpleado(@PathVariable Long id){
 
+        /*
         Optional<Empleado> empleado = empleadoRepository.findById(id);
         if(empleado.isPresent()){
             empleadoRepository.delete(empleado.get());
@@ -95,5 +105,14 @@ public class EmpleadoAPIController {
         else{
             return ResponseEntity.notFound().build();   //Devuelve el código status 404 Not Found
         }
+        */
+
+
+        return empleadoRepository.findById(id)
+                .map(empleado -> {
+                    empleadoRepository.delete(empleado);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
