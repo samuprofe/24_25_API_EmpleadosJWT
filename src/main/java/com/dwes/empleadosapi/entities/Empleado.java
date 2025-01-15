@@ -1,9 +1,13 @@
 package com.dwes.empleadosapi.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +22,14 @@ public class Empleado {
     private String apellidos;
     @Column(unique = true)
     private String email;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "empleado_proyecto",
+            joinColumns = @JoinColumn(name = "empleado_id"),
+            inverseJoinColumns = @JoinColumn(name = "proyecto_id")
+    )
+
+    private List<Proyecto> proyectos = new ArrayList<>();
+
 }

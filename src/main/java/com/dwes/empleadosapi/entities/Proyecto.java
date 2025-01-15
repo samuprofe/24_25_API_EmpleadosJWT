@@ -1,18 +1,18 @@
 package com.dwes.empleadosapi.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Crear una Entidad llamada Proyecto con los datos "nombre", "presupuesto", "descripción" y "fechaInicio".
- * Implementar una API REST para poder obtener todas, obtener una, actualizar, crear y borrar.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,4 +28,9 @@ public class Proyecto {
     private BigDecimal presupuesto;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate fechaInicio;
+
+    @ManyToMany(mappedBy = "proyectos", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Empleado> empleados = new ArrayList<>();
+
 }
