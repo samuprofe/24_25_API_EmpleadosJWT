@@ -5,6 +5,7 @@ import com.dwes.empleadosapi.entities.Proyecto;
 import com.dwes.empleadosapi.repositories.EmpleadoRepository;
 import com.dwes.empleadosapi.repositories.ProyectoRepository;
 import jakarta.servlet.ServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class EmpleadoAPIController {
      * Insertar un empleado (recibe los datos en el cuerpo (body) en formato JSON)
      */
     @PostMapping("/empleados")
-    public ResponseEntity<Empleado> insertEmpleado(@RequestBody Empleado empleado){
+    public ResponseEntity<Empleado> insertEmpleado(@RequestBody @Valid Empleado empleado){
         var empleadoGuardado = empleadoRepository.save(empleado);
         return ResponseEntity.status(HttpStatus.CREATED).body(empleadoGuardado);    //Devuelve el código status 201 Created
     }
@@ -63,7 +64,7 @@ public class EmpleadoAPIController {
      * Modifica un empleado
      */
     @PutMapping("/empleados/{id}")
-    public ResponseEntity<Empleado> editEmpleado(@PathVariable Long id, @RequestBody Empleado nuevoEmpleado){
+    public ResponseEntity<Empleado> editEmpleado(@PathVariable Long id, @RequestBody @Valid Empleado nuevoEmpleado){
         /*
         Optional<Empleado> empleado = empleadoRepository.findById(id);
         if(empleado.isPresent()){
@@ -78,15 +79,9 @@ public class EmpleadoAPIController {
 
         return empleadoRepository.findById(id)
                 .map(empleado -> {
-                    if(nuevoEmpleado.getNombre() != null) { //Comprobamos si en el JSON de entrada el campo viene definido, sino mantenemos los datos originales
-                        empleado.setNombre(nuevoEmpleado.getNombre());
-                    }
-                    if(nuevoEmpleado.getApellidos() != null) {
-                        empleado.setApellidos(nuevoEmpleado.getApellidos());
-                    }
-                    if(nuevoEmpleado.getEmail() != null) {
-                        empleado.setEmail(nuevoEmpleado.getEmail());
-                    }
+                    empleado.setNombre(nuevoEmpleado.getNombre());
+                    empleado.setApellidos(nuevoEmpleado.getApellidos());
+                    empleado.setEmail(nuevoEmpleado.getEmail());
                     return ResponseEntity.ok(empleadoRepository.save(empleado));    //Devuelve el código 200 OK y en el cuerpo del mensaje el nuevo empleado en JSON
                 })
                 .orElseGet(() -> {
