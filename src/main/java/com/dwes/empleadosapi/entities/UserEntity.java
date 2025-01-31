@@ -23,12 +23,17 @@ public class UserEntity implements UserDetails{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String email;
+    @Column(unique = true)
     private String username;
     private String password;
-    private String email;
 
-    @ElementCollection(fetch = FetchType.EAGER) //// Indica que esta lista se almacena en una tabla separada, pero sin una relación
-    @Enumerated(EnumType.STRING)
+
+    @Builder.Default    //Para que Lombok con el patrón builder cree el ArrayList
+    @ElementCollection(fetch = FetchType.EAGER) // Indica que esta lista se almacena en una tabla separada, pero sin una relación
+    //@Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"))
     private List<String> authorities = new ArrayList<>();
 
     @Override

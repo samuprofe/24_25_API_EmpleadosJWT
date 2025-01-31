@@ -11,27 +11,32 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 /**
- * Extrae el token JW de la cabecera Authoritation de la petición HTTP
+ * Extrae el token JWT de la cabecera Authoritation de la petición HTTP
  */
+@Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
+
+    public JwtFilter(JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
+        this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = this.extractToken(request);
 
-        if(this.tokenProvider.validateToken(token)){
-            String username = this.tokenProvider.extractUsername(token);
+        if(this.tokenProvider.isValidToken(token)){
+            String username = this.tokenProvider.getUsernameFromToken(token);
 
             //UserDetails representa al usuario
             UserDetails user = this.userDetailsService.loadUserByUsername(username); //Carga el usuario de la base de datos
@@ -42,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     user.getPassword(),
                     user.getAuthorities());
 
-            //SecurityContext permite ver si hay un usuario logeado o no
+            //SecurityContext permite ver o establecer un usuario logeado
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

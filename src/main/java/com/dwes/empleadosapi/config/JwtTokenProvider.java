@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -17,18 +18,18 @@ public class JwtTokenProvider {
     private static final long EXPIRATION_TIME = 86400000; // 1 día
 
 
-    public String generateToken(Authentication authentication) {
+    public String  generateToken(Authentication authentication) {
 
         UserEntity user = (UserEntity) authentication.getPrincipal();
-        Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
         return Jwts.builder()
-                .subject(Long.toString(user.getId())) // Reemplaza setSubject
+                .subject(Long.toString(user.getId()))
                 .claim("email", user.getEmail())
                 .claim("username", user.getUsername())
-                .issuedAt(new Date()) // Reemplaza setIssuedAt
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Reemplaza setExpiration
-                .signWith(key) // Reemplaza signWith con Key y SignatureAlgorithm
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(key) // Firma con el algoritmo por defecto
                 .compact();
     }
 
@@ -38,11 +39,13 @@ public class JwtTokenProvider {
             return false;
         }
 
+        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+
         try {
             JwtParser validator = Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                    .verifyWith(key)
                     .build();
-            validator.parseClaimsJws(token);
+            validator.parse(token);
             return true;
         }catch (Exception e){
             //Aquí entraría si el token no fuera correcto o estuviera caducado.
@@ -51,5 +54,13 @@ public class JwtTokenProvider {
             return false;
         }
 
+    }
+
+    public String getUsernameFromToken(String token) {
+        JwtParser parser = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                .build();
+        Claims claims = parser.parseClaimsJws(token).getBody();
+        return claims.get("username").toString();
     }
 }
