@@ -14,7 +14,7 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private static final String SECRET_KEY = "SuperClaveSecretaParaElJwtCon32CaracteresMin";
+    private static final String SECRET_KEY = "zskfldj394852l3kj4tho9a8yt9qa4)()(%&asfdasdrtg45545·%·%";
     private static final long EXPIRATION_TIME = 86400000; // 1 día
 
 
@@ -27,6 +27,7 @@ public class JwtTokenProvider {
                 .subject(Long.toString(user.getId()))
                 .claim("email", user.getEmail())
                 .claim("username", user.getUsername())
+                .claim("foto","default.jpg")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key) // Firma con el algoritmo por defecto

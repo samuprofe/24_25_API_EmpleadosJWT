@@ -2,7 +2,7 @@ package com.dwes.empleadosapi.controllers;
 
 import com.dwes.empleadosapi.DTO.LoginRequestDTO;
 import com.dwes.empleadosapi.DTO.LoginResponseDTO;
-import com.dwes.empleadosapi.DTO.UserRegistrerDTO;
+import com.dwes.empleadosapi.DTO.UserRegisterDTO;
 import com.dwes.empleadosapi.config.JwtTokenProvider;
 import com.dwes.empleadosapi.entities.UserEntity;
 import com.dwes.empleadosapi.repositories.UserEntityRepository;
@@ -34,17 +34,24 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/auth/register")
-    public ResponseEntity<UserEntity> save(@RequestBody UserRegistrerDTO userDTO) {
-        UserEntity userEntity = this.userRepository.save(
+    public ResponseEntity<Map<String,String>> save(@RequestBody UserRegisterDTO userDTO) {
+        try {
+            UserEntity userEntity = this.userRepository.save(
                 UserEntity.builder()
                 .username(userDTO.getUsername())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .email(userDTO.getEmail())
                 .authorities(List.of("ROLE_USER", "ROLE_ADMIN"))
+                .foto(userDTO.getFoto())
                 .build());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userEntity);
-
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    Map.of("email",userEntity.getEmail(),
+                    "username",userEntity.getUsername())
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","Email o username ya utilizado"));
+        }
     }
 
     @PostMapping("/auth/login")
