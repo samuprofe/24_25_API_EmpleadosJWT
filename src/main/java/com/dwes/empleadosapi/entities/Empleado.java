@@ -28,7 +28,7 @@ public class Empleado {
     @Email
     private String email;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}) //Si pusieramos CascadeType.ALL al borrar un empleado se borrarían todos sus proyectos...
     @JoinTable(
             name = "empleado_proyecto",
             joinColumns = @JoinColumn(name = "empleado_id"),

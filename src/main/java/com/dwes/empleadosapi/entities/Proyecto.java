@@ -31,10 +31,10 @@ public class Proyecto {
     @Column(precision = 10, scale = 2)  //Para números de hasta 999.999.999,99 con 2 decimales
     @Min(value = 0, message = "El valor del presupuesto tiene que ser mayor que cero")
     private BigDecimal presupuesto;
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaInicio;
 
-    @ManyToMany(mappedBy = "proyectos", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "proyectos", cascade = {CascadeType.PERSIST, CascadeType.MERGE}) //Si pusieramos CascadeType.ALL al borrar un proyecto se borrarían todos sus empledos asociados...
     @JsonIgnore
     private List<Empleado> empleados = new ArrayList<>();
 

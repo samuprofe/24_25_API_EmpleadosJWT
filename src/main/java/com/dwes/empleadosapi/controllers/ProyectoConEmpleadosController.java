@@ -33,18 +33,6 @@ public class ProyectoConEmpleadosController {
             );
         });
 
-        /*
-        List<Proyecto> proyectos = proyectoRepository.findAll();
-        proyectos.forEach(proyecto -> {
-            ProyectoConEmpleadosDTO proyectoDTO = new ProyectoConEmpleadosDTO(
-                    proyecto.getNombre(),
-                    proyecto.getDescripcion(),
-                    proyecto.getFechaInicio(),
-                    proyecto.getEmpleados().size()
-            );
-            proyectosDTO.add(proyectoDTO);
-        })
-        */
         return ResponseEntity.ok(proyectosDTO);
     }
 
